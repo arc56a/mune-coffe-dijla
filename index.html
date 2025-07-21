@@ -245,7 +245,7 @@
                     </div>
                     <div class="menu-card flex justify-between items-center">
                         <div>
-                            <h3 class="item-name text-xl">� ليمون</h3>
+                            <h3 class="item-name text-xl">🍋 ليمون</h3>
                             <p class="text-gray-400">نكهة الليمون المنعشة</p>
                         </div>
                         <div class="flex items-baseline">
@@ -456,7 +456,11 @@
                 menuSections.forEach(section => {
                     section.style.display = 'none'; // Hide all sections
                 });
-                document.getElementById(sectionId).style.display = 'block'; // Show the target section
+                const targetSection = document.getElementById(sectionId);
+                targetSection.style.display = 'block'; // Show the target section
+
+                // Scroll to the top of the displayed section smoothly
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                 // Update active button state
                 navButtons.forEach(button => {
