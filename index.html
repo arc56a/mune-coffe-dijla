@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة كوفي ضفاف دجلة</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Cairo for better Arabic display -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif; /* Using Cairo for better Arabic display */
+            background-color: #1a202c; /* Dark background color */
+            color: #e2e8f0; /* Light text for readability on dark background */
+        }
+        .menu-card {
+            background-color: #2d3748; /* Darker background for cards */
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for dark mode */
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.2s;
+            position: relative; /* Needed for absolute positioning of overlay */
+            overflow: hidden; /* Ensure overlay stays within bounds */
+        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            color: #63b3ed; /* A lighter blue for section titles on dark background */
+            border-bottom: 2px solid #63b3ed;
+            padding-bottom: 8px;
+            margin-bottom: 24px;
+            display: flex; /* Use flexbox for title and icon alignment */
+            align-items: center; /* Vertically align items */
+            gap: 10px; /* Space between icon and text */
+        }
+        .item-name {
+            font-weight: 700;
+            color: #f7fafc; /* White for item names */
+            display: flex; /* Use flexbox for item name and icon */
+            align-items: center; /* Vertically align items */
+            gap: 8px; /* Space between icon and text */
+        }
+        .item-price {
+            color: #22c55e; /* Green color for prices */
+            font-weight: 700;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* Darker scrollbar track */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* Darker scrollbar thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+        /* Style for navigation buttons */
+        .nav-button {
+            background-color: #3a475a; /* A darker, subtle background for inactive buttons */
+            color: #cbd5e0; /* Lighter text for inactive buttons */
+            border: 1px solid #4a5568; /* Subtle border */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+            position: relative; /* For pseudo-elements or more complex hover effects */
+            overflow: hidden; /* To contain pseudo-elements */
+            display: flex; /* Use flexbox for button content */
+            align-items: center; /* Vertically align items */
+            gap: 8px; /* Space between icon and text */
+        }
+        .nav-button:hover {
+            background-color: #4a5568; /* Slightly lighter on hover */
+            color: #ffffff; /* White text on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        /* Style for active navigation button */
+        .nav-button.active {
+            background: linear-gradient(to right, #63b3ed, #4299e1); /* Gradient for active button */
+            color: #1a202c; /* Dark text for active button */
+            font-weight: bold;
+            border-color: #63b3ed; /* Border color matching gradient */
+            box-shadow: 0 4px 15px rgba(99, 179, 237, 0.6); /* Stronger shadow for active */
+            transform: translateY(-2px); /* Maintain lift */
+        }
+
+        /* Shimmer effect for the coffee shop name */
+        .shimmer-text {
+            background: linear-gradient(90deg, #FFD700 0%, #FFFACD 20%, #FFD700 40%, #FFD700 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite linear; /* Adjust duration and timing function as needed */
+            line-height: 1.1; /* Adjusted line height to prevent cutting off the 'ي' */
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        .discount-price {
+            text-decoration: line-through;
+            color: #ef4444; /* Red color for original price */
+            font-size: 0.8em; /* Smaller font size for original price */
+            margin-inline-end: 8px; /* Space between original and discounted price */
+        }
+
+        /* Styles for "Coming Soon" overlay */
+        .coming-soon-overlay {
+            position: relative; /* Ensure card is relative for absolute overlay */
+            pointer-events: none; /* Allow clicks to pass through to the card if needed, though buttons are disabled */
+        }
+
+        .coming-soon-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark overlay */
+            border-radius: 15px; /* Match card border-radius */
+            z-index: 10; /* Above card content */
+        }
+
+        .coming-soon-overlay::after {
+            content: 'قريباً'; /* "Coming Soon" text */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f6ad55; /* Orange background for the text */
+            color: #1a202c; /* Dark text for contrast */
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            z-index: 20; /* Above the overlay */
+            white-space: nowrap; /* Prevent text wrapping */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <!-- Header Section -->
+        <header class="bg-gradient-to-r from-gray-900 to-gray-700 text-white p-6 sm:p-8 text-center rounded-t-lg">
+            <div class="flex items-center justify-center space-x-4 mb-2">
+                <!-- Left Logo -->
+                <img src="https://j.top4top.io/p_3476es6zg0.png" alt="شعار كوفي ضفاف دجلة" class="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover">
+                <!-- Royal Gold color for the coffee shop name with shimmer effect -->
+                <h1 class="text-3xl sm:text-4xl font-bold shimmer-text">كوفي ضفاف دجلة</h1>
+                <!-- Right Logo -->
+                <img src="https://j.top4top.io/p_3476es6zg0.png" alt="شعار كوفي ضفاف دجلة" class="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover">
+            </div>
+            <!-- Added small text below the coffee shop name -->
+            <p class="text-sm text-gray-400">المينيو الخاص بالكوفي</p>
+        </header>
+
+        <!-- Navigation Buttons -->
+        <nav class="py-6 bg-gray-900 border-b border-gray-700">
+            <div class="flex flex-wrap justify-center gap-4 text-lg font-semibold px-4">
+                <button class="nav-button px-6 py-3 rounded-full" data-section="food-section">🍔 الطعام</button>
+                <button class="nav-button px-6 py-3 rounded-full" data-section="shisha-section">💨 النراجيل</button>
+                <button class="nav-button px-6 py-3 rounded-full" data-section="juices-section">🥤 العصائر</button>
+                <button class="nav-button px-6 py-3 rounded-full" data-section="hot-drinks-section">☕ المشروبات الساخنة</button>
+                <button class="nav-button px-6 py-3 rounded-full" data-section="cold-drinks-section">🧊 المشروبات الباردة</button>
+                <button class="nav-button px-6 py-3 rounded-full" data-section="games-section">🎮 الألعاب</button>
+            </div>
+        </nav>
+
+        <!-- Menu Content Container -->
+        <main class="p-6 sm:p-8">
+            <!-- Food Section Content -->
+            <section id="food-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">🍔 الطعام</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Food Items - Prices adjusted -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍔 برجر لحم</h3>
+                            <p class="text-gray-400">لحم بقري، خس، طماطم، جبنة، صوص خاص</p>
+                        </div>
+                        <span class="item-price text-lg">3,500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🌮 فاهيتا دجاج</h3>
+                            <p class="text-gray-400">دجاج مشوي، فلفل ألوان، بصل، خبز التورتيلا</p>
+                        </div>
+                        <span class="item-price text-lg">3,000 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥪 ساندويتش كلوب</h3>
+                            <p class="text-gray-400">ديك رومي، جبنة، بيض، خس، طماطم</p>
+                        </div>
+                        <span class="item-price text-lg">2,500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍟 بطاطا مقلية</h3>
+                            <p class="text-gray-400">بطاطا ذهبية مقرمشة مع الكاتشب</p>
+                        </div>
+                        <span class="item-price text-lg">1,500 د.ع</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shisha Section Content -->
+            <section id="shisha-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">💨 النراجيل</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Shisha Items - Updated with discount -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍎 تفاحتين</h3>
+                            <p class="text-gray-400">نكهة التفاح الكلاسيكية</p>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="discount-price">3,000 د.ع</span>
+                            <span class="item-price text-lg">2,000 د.ع</span>
+                        </div>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍬 علج ونعناع</h3>
+                            <p class="text-gray-400">مزيج منعش من العلكة والنعناع</p>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="discount-price">3,000 د.ع</span>
+                            <span class="item-price text-lg">2,000 د.ع</span>
+                        </div>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">� ليمون</h3>
+                            <p class="text-gray-400">نكهة الليمون المنعشة</p>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="discount-price">3,000 د.ع</span>
+                            <span class="item-price text-lg">2,000 د.ع</span>
+                        </div>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍓 فواكه مشكلة</h3>
+                            <p class="text-gray-400">مزيج من نكهات الفواكه المتنوعة</p>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="discount-price">3,000 د.ع</span>
+                            <span class="item-price text-lg">2,000 د.ع</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Juices Section Content -->
+            <section id="juices-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">🥤 العصائر</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Juice Items -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍊 عصير برتقال طازج</h3>
+                            <p class="text-gray-400">برتقال طبيعي 100%</p>
+                        </div>
+                        <span class="item-price text-lg">5,000 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍒 عصير رمان</h3>
+                            <p class="text-gray-400">عصير رمان طبيعي</p>
+                        </div>
+                        <span class="item-price text-lg">6,000 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍋 عصير ليمون بالنعناع</h3>
+                            <p class="text-gray-400">ليمون طازج مع النعناع المنعش</p>
+                        </div>
+                        <span class="item-price text-lg">5,500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥭 عصير مانجو</h3>
+                            <p class="text-gray-400">مانجو طبيعية</p>
+                        </div>
+                        <span class="item-price text-lg">5,000 د.ع</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hot Drinks Section Content -->
+            <section id="hot-drinks-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">☕ المشروبات الساخنة</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Hot Drink Items - Updated -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍵 شاي</h3>
+                            <p class="text-gray-400">شاي أحمر عراقي</p>
+                        </div>
+                        <span class="item-price text-lg">250 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍋 حامض</h3>
+                            <p class="text-gray-400">مشروب حامض منعش</p>
+                        </div>
+                        <span class="item-price text-lg">500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">☕ قهوة</h3>
+                            <p class="text-gray-400">قهوة سادة</p>
+                        </div>
+                        <span class="item-price text-lg">500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍫 قهوة جكليتية</h3>
+                            <p class="text-gray-400">قهوة بنكهة الشوكولاتة</p>
+                        </div>
+                        <span class="item-price text-lg">750 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">☕ نسكافيه</h3>
+                            <p class="text-gray-400">نسكافيه بالحليب</p>
+                        </div>
+                        <span class="item-price text-lg">1,000 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥛 كبجينو</h3>
+                            <p class="text-gray-400">كابتشينو غني بالرغوة</p>
+                        </div>
+                        <span class="item-price text-lg">1,000 د.ع</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cold Drinks Section Content -->
+            <section id="cold-drinks-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">🧊 المشروبات الباردة</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Cold Drink Items -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥤 بيبسي</h3>
+                            <p class="text-gray-400">مشروب غازي بيبسي</p>
+                        </div>
+                        <span class="item-price text-lg">500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">💧 ماء</h3>
+                            <p class="text-gray-400">ماء معدني</p>
+                        </div>
+                        <span class="item-price text-lg">250 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥤 ميرندا</h3>
+                            <p class="text-gray-400">مشروب غازي ميرندا</p>
+                        </div>
+                        <span class="item-price text-lg">500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🍌 عصير موز</h3>
+                            <p class="text-gray-400">عصير موز طازج</p>
+                        </div>
+                        <span class="item-price text-lg">1,000 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🥛 موز وحليب</h3>
+                            <p class="text-gray-400">مزيج الموز والحليب</p>
+                        </div>
+                        <span class="item-price text-lg">1,500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">⚡ مشروب طاقة</h3>
+                            <p class="text-gray-400">مشروب طاقة منعش</p>
+                        </div>
+                        <span class="item-price text-lg">500 د.ع</span>
+                    </div>
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🌶️ مكسيكي</h3>
+                            <p class="text-gray-400">مشروب مكسيكي خاص</p>
+                        </div>
+                        <span class="item-price text-lg">1,000 د.ع</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Games Section Content -->
+            <section id="games-section" class="menu-section-content">
+                <h2 class="text-3xl font-bold section-title">🎮 الألعاب</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Game Items -->
+                    <div class="menu-card flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🎱 بلياردو الجيم</h3>
+                            <p class="text-gray-400">جيم واحد بلياردو</p>
+                        </div>
+                        <span class="item-price text-lg">1,000 د.ع</span>
+                    </div>
+                    <div class="menu-card coming-soon-overlay flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🎯 فيشة</h3>
+                            <p class="text-gray-400">جيم واحد فيشة</p>
+                        </div>
+                        <!-- Price removed, overlay handles "قريباً" -->
+                    </div>
+                    <div class="menu-card coming-soon-overlay flex justify-between items-center">
+                        <div>
+                            <h3 class="item-name text-xl">🎮 بلاي ستيشن 4</h3>
+                            <p class="text-gray-400">30 دقيقة لعب بلاي ستيشن 4</p>
+                        </div>
+                        <!-- Price removed, overlay handles "قريباً" -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="bg-gray-900 text-gray-300 p-6 sm:p-8 text-center rounded-b-lg mt-8">
+            <p class="text-lg">&copy; 2025 كوفي ضفاف دجلة. كل الحقوق محفوظة.</p>
+            <p class="text-md mt-2">نتطلع لخدمتكم!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const menuSections = document.querySelectorAll('.menu-section-content');
+
+            // Function to show a specific section and hide others
+            function showSection(sectionId) {
+                menuSections.forEach(section => {
+                    section.style.display = 'none'; // Hide all sections
+                });
+                document.getElementById(sectionId).style.display = 'block'; // Show the target section
+
+                // Update active button state
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                document.querySelector(`.nav-button[data-section="${sectionId}"]`).classList.add('active');
+            }
+
+            // Add click event listeners to navigation buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sectionId = this.dataset.section;
+                    showSection(sectionId);
+                });
+            });
+
+            // Show the first section by default when the page loads
+            if (navButtons.length > 0) {
+                showSection(navButtons[0].dataset.section);
+            }
+        });
+    </script>
+</body>
+</html>
+�
